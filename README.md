@@ -55,3 +55,4 @@ Tests are created using Mocha. To run them, simply type `npm test`. Each describ
 ## Potential Improvements
 - Defining the roles of the producer and consumer at first would have made the development process a bit quicker. Rather than figuring out role responsibilities while developing, it would have been easier to draw out a simple relationship diagram from the start. 
 - Splitting up `Producer.prototype.emitTime()` into separate functions could help improve modularity. Another way to design the consumer staleness check could be to have the Producer run through consumers and observe their `lastKeepAlive` date, rather than relying on the `emitTime()` function to perform that check. The fact that they are combined in a single function muddles the individuality of the producer's tasks.   
+- I learned that NodeJS' EventEmitter is not asynchronous. Packages exist to support asynchronous events, however I didn't see the benefit for this particular application. 
