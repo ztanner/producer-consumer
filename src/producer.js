@@ -1,7 +1,7 @@
 var util = require('util');
 var events = require('events');
 
-function isStaleConsumer(lastKeepAlive) {
+function isActiveConsumer(lastKeepAlive) {
   return Math.abs(lastKeepAlive - new Date()) < 10000;
 }
 
@@ -36,7 +36,7 @@ Producer.prototype.emitTime = function () {
   var date = new Date();
 
   for (var key in self.consumers) {
-    if (!isStaleConsumer(self.consumers[key].lastKeepAlive)) {
+    if (!isActiveConsumer(self.consumers[key].lastKeepAlive)) {
       console.info(self.name + " retiring consumer: " + key);
       delete self.consumers[key];
     } else {
