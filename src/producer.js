@@ -36,11 +36,13 @@ Producer.prototype.emitTime = function () {
   var date = new Date();
 
   for (var key in self.consumers) {
-    if (!isActiveConsumer(self.consumers[key].lastKeepAlive)) {
-      console.info(self.name + " retiring consumer: " + key);
-      delete self.consumers[key];
-    } else {
-      self.consumers[key].consumer.emit('Time', date.toISOString());
+    if (self.consumers.hasOwnProperty(key)) {
+      if (!isActiveConsumer(self.consumers[key].lastKeepAlive)) {
+        console.info(self.name + " retiring consumer: " + key);
+        delete self.consumers[key];
+      } else {
+        self.consumers[key].consumer.emit('Time', date.toISOString());
+      }
     }
   }
 
