@@ -1,5 +1,5 @@
-var Consumer = require('../src/Consumer');
-var Producer = require('../src/Producer');
+var Consumer = require('../src/consumer');
+var Producer = require('../src/producer');
 var assert = require('assert');
 
 describe("Consumers", function() {

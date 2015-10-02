@@ -1,5 +1,5 @@
-var Consumer = require('./Consumer');
-var Producer = require('./Producer');
+var Consumer = require('./consumer');
+var Producer = require('./producer');
 
 function initialize(numConsumers) {
   var producer = new Producer("Producer");
