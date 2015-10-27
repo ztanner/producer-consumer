@@ -1,41 +1,38 @@
 var util = require('util');
 var events = require('events');
 
-var Consumer = function (name, keepAliveCount, producer) {
-  var self = this;
-  self.producer = producer;
-  self.name = name;
-  self.keepAliveCount = keepAliveCount;
-  self.interval = null;
+class Consumer extends events.EventEmitter {
+  constructor(name, keepAliveCount, producer) {
+    super();
+    this.name = name;
+    this.keepAliveCount = keepAliveCount;
+    this.producer = producer;
+    this.interval = null;
+    
+    producer.emit('Register', this);
 
-  producer.emit('Register', self);
+    this.on('Time', (time) => {
+      console.info(`${this.name} received a message: (Time): ${time}`);
+    });
+  }
 
   // Initializes the consumer interval to emit KeepAlive every 5000ms.
-  self.start = function () {
-    self.interval = setInterval(function () {
-      self.emitKeepAlive();
-    }, 5000);
-  };
-
-  self.on('Time', function (time) {
-    console.info(self.name + " received a message:" + " (Time): " + time);
-  });
-};
-
-util.inherits(Consumer, events.EventEmitter);
-
-Consumer.prototype.emitKeepAlive = function () {
-  var self = this;
-
-  if (self.keepAliveCount === 0) {
-    clearInterval(self.interval);
+  start() {
+    this.interval = setInterval(() => {
+      this.emitKeepAlive();
+    }, 5000)
   }
-  else {
-    console.info(self.name + " sending a message: (KeepAlive)");
-    self.producer.emit('KeepAlive', self);
-    self.keepAliveCount--;
+  
+  emitKeepAlive() {
+    if (this.keepAliveCount === 0) {
+      clearInterval(this.interval);
+    }
+    else {
+      console.info(`${this.name} sending a message: (KeepAlive)`);
+      this.producer.emit('KeepAlive', this);
+      this.keepAliveCount--;
+    }
   }
-};
-
+}
 
 module.exports = Consumer;

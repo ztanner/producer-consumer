@@ -2,10 +2,12 @@
   "name": "bottlenose",
   "version": "0.0.1",
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "babel": "^5.8.29"
+  },
   "scripts": {
     "start": "node ./src/app",
-    "test": "mocha ./tests"
+    "test": "mocha ./tests --require babel/register"
   },
   "devDependencies": {
     "mocha": "^2.3.3"

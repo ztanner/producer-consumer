@@ -1,3 +1,4 @@
+require('babel/register');
 var Consumer = require('./consumer');
 var Producer = require('./producer');
 

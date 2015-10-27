@@ -3,6 +3,7 @@
 ## Requirements
 - NodeJS
 - Mocha ^2.3.3
+- babel: ^5.8.29
 
 ## Setup & Installation
 Simply run `npm install` followed by `npm start <num_consumers>` to run the program. Example: `npm start 5` will run the application with 5 consumers. 

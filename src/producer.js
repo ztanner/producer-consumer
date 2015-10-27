@@ -5,51 +5,50 @@ function isActiveConsumer(lastKeepAlive) {
   return Math.abs(lastKeepAlive - new Date()) < 10000;
 }
 
-var Producer = function (name) {
-  var self = this;
-  self.name = name;
-  self.consumers = {};
-  self.interval = null;
+class Producer extends events.EventEmitter {
+  constructor(name) {
+    super();
+    this.name = name;
+    this.consumers = {};
+    this.interval = null;
 
-  // Initializes the producer interval to emit the time every 1000ms.
-  self.start = function () {
-    self.interval = setInterval(function () {
-      self.emitTime();
-    }, 1000);
-  };
+    this.on('Register', (consumer) => {
+      console.info(`${this.name} received a message: (Register) from ${consumer.name}`);
+      this.consumers[consumer.name] = { consumer: consumer, lastKeepAlive: new Date() };
+    });
 
-  self.on('Register', function (consumer) {
-    console.info(self.name + " received a message: (Register) from " + consumer.name);
-    self.consumers[consumer.name] = { consumer: consumer, lastKeepAlive: new Date() };
-  });
+    this.on('KeepAlive', (consumer) => {
+      console.info(`${this.name} received a message: (KeepAlive) from ${consumer.name}`);
+      this.consumers[consumer.name].lastKeepAlive = new Date();
+    });
+  }
 
-  self.on('KeepAlive', function (consumer) {
-    console.info(self.name + " received a message: (KeepAlive) from " + consumer.name);
-    self.consumers[consumer.name].lastKeepAlive = new Date();
-  });
-};
+  start() {
+    this.interval = setInterval(() => {
+      this.emitTime();
+    }, 1000)
+  }
 
-util.inherits(Producer, events.EventEmitter);
+  emitTime() {
+    let date = new Date();
 
-Producer.prototype.emitTime = function () {
-  var self = this;
-  var date = new Date();
-
-  for (var key in self.consumers) {
-    if (self.consumers.hasOwnProperty(key)) {
-      if (!isActiveConsumer(self.consumers[key].lastKeepAlive)) {
-        console.info(self.name + " retiring consumer: " + key);
-        delete self.consumers[key];
-      } else {
-        self.consumers[key].consumer.emit('Time', date.toISOString());
+    for (var key in this.consumers) {
+      if (this.consumers.hasOwnProperty(key)) {
+        if (!isActiveConsumer(this.consumers[key].lastKeepAlive)) {
+          console.info(`${this.name} is retiring consumer: ${key}`);
+          delete this.consumers[key];
+        } else {
+          this.consumers[key].consumer.emit('Time', date.toISOString());
+        }
       }
+    }
+
+    if (Object.keys(this.consumers).length === 0) {
+      clearInterval(this.interval);
+      console.log(`${this.name}: All consumers finished.`);
     }
   }
 
-  if (Object.keys(self.consumers).length === 0) {
-    clearInterval(self.interval);
-    console.log(self.name + ": All consumers finished.");
-  }
-};
+}
 
 module.exports = Producer;
